@@ -10,6 +10,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.route.js"
+import messageRoutes from "./routes/messages.route.js"
+import userRoutes from "./routes/user.route.js"
 import connectToMongoDB from './db/connectToMongoDB.js';
 
 
@@ -30,6 +32,8 @@ app.use(cookieParser());
 
 
 app.use("/", authRoutes);
+app.use("/", messageRoutes);
+app.use("/", userRoutes);
 
 
 app.listen(PORT,()=>{
