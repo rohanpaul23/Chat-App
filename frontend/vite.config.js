@@ -6,8 +6,10 @@ export default defineConfig({
   server : {
     proxy: {
       '/login': 'http://localhost:8000/',
-      '/signup': 'http://localhost:8000/'
-    }
+      '/signup': 'http://localhost:8000/',
+      '/users': 'http://localhost:8000/',
+      '/getmessage': 'http://localhost:8000/'
+    } 
   },
   plugins: [react(
     {

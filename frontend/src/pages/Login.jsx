@@ -6,11 +6,12 @@ import { css } from '@emotion/react'
 import { shouldDisableSubmit } from "../utils";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router";
-
+import { useUserContext } from "../UserContexts";
 
 
 const Login = () => {
   let navigate = useNavigate();
+  const {setCurrentUser} = useUserContext();
 
   const validationSchema = yup.object({
     username: yup
@@ -25,7 +26,7 @@ const Login = () => {
 
   const loginUser = async (values) => {
     try {
-      await fetch('/login', {
+      const result = await fetch('/login', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -36,7 +37,11 @@ const Login = () => {
           password: values.password,
         }),
       });
+      const user = await result.json()
+      localStorage.setItem("current-user", JSON.stringify(user));
+      setCurrentUser(user)
       navigate("/home");
+
     }
     catch(e){
       console.log(e)

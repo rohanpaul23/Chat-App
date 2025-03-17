@@ -11,9 +11,12 @@ import Select from "@mui/material/Select";
 import { Link } from "react-router-dom";
 import { shouldDisableSubmit } from "../utils";
 import { useNavigate } from "react-router";
+import { useUserContext } from "../UserContexts";
 
 const SignUp = () => {
   let navigate = useNavigate();
+  const {setCurrentUser} = useUserContext();
+
   const validationSchema = yup.object({
     fullName: yup
       .string()
@@ -36,7 +39,7 @@ const SignUp = () => {
 
   const signUpUser = async (values) => {
     try {
-     await fetch('/signup', {
+     const result = await fetch('/signup', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -50,6 +53,9 @@ const SignUp = () => {
          gender: values.gender
         }),
       });
+      const user = await result.json();
+      localStorage.setItem("current-user", JSON.stringify(user));
+      setCurrentUser(user)
       navigate("/home");
     }
     catch(e){

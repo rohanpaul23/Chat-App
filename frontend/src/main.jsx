@@ -9,12 +9,16 @@ import App from './App.jsx'
 import { BrowserRouter } from "react-router-dom";
 import { HashRouter } from 'react-router-dom'
 
+import { UserContextProvider } from "./UserContexts.jsx"
+
 
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HashRouter>
+      <UserContextProvider>
         <App />
+      </UserContextProvider>
     </HashRouter>
   </StrictMode>,
 )
