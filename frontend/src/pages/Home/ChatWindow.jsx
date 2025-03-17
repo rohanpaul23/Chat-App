@@ -3,10 +3,12 @@ import { css } from "@emotion/react";
 import { useUserContext } from "../../UserContexts";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
+import {produce} from "immer"
+
 
 const ChatWindow = ({selectedUser}) => {
   const [messages,setMessages] = useState([])
-  const [currentInputMessage,setCurrentInputMessage] = useState()
+  const [currentInputMessage,setCurrentInputMessage] = useState("")
   console.log("selectedUser",selectedUser)
 
   const {currentUser} = useUserContext();
@@ -89,6 +91,30 @@ const ChatWindow = ({selectedUser}) => {
     } 
   `
 
+  const sendMessage = async () => {
+		try {
+			const res = await fetch(`/send/${selectedUser?._id}`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: currentInputMessage,
+        }),
+			});
+			const data = await res.json();
+			if (data.error) {
+				throw new Error(data.error);
+			}
+      const allMessages = produce(messages, draftState => {
+        draftState.push(data)
+      })
+      setMessages(allMessages)
+      setCurrentInputMessage("")
+		}
+    catch(e){
+      console.log(e)
+    }
+	};
+
   return (
     <>
     {selectedUser === undefined ? (
@@ -154,7 +180,9 @@ const ChatWindow = ({selectedUser}) => {
         })}>
           <input type='text-box' css={inputBox}
           placeholder='Send Message'
+          value={currentInputMessage}
           onChange={(e)=>setCurrentInputMessage(e.target.value)}
+          onkeydown={()=>sendMessage()}
           >
           </input>
           <SendRoundedIcon css={css({
@@ -162,7 +190,7 @@ const ChatWindow = ({selectedUser}) => {
             right: 5,
             top: 5,
             color : "white !important"
-          })}/>
+          })} onClick={()=>sendMessage()}/>
         </div>
       </div>
       )

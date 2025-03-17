@@ -9,7 +9,8 @@ export default defineConfig({
       '/signup': 'http://localhost:8000/',
       '/users': 'http://localhost:8000/',
       '/getmessage': 'http://localhost:8000/',
-      '/logout': 'http://localhost:8000/'
+      '/logout': 'http://localhost:8000/',
+      '/send': 'http://localhost:8000/'
     } 
   },
   plugins: [react(
