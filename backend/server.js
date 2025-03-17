@@ -14,13 +14,13 @@ import messageRoutes from "./routes/messages.route.js"
 import userRoutes from "./routes/user.route.js"
 import connectToMongoDB from './db/connectToMongoDB.js';
 
+import { app, server } from "./socket.js";
+
+
 
 dotenv.config();
 
 
-
-
-const app = express();
 
 
 const __dirname = path.resolve();
@@ -36,7 +36,7 @@ app.use("/", messageRoutes);
 app.use("/", userRoutes);
 
 
-app.listen(PORT,()=>{
+server.listen(PORT,()=>{
     connectToMongoDB();
     console.log(`server running on ${PORT}`);
 })

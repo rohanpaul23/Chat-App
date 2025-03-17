@@ -4,12 +4,12 @@ import { css } from "@emotion/react";
 
 const SearchBar = ({setSearchUser}) => {
  const inputBox = css`
-   width : 100%;
-    height: 40px;
-       box-sizing : border-box;
-     background : #1976d2;
+    height: 35px;
+    box-sizing : border-box;
+     background : #84b6e7;
      border: none;
      border-radius: 10px;
+     margin: 5px;
 
      :focus {
       outline : none;

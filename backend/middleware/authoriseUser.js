@@ -4,7 +4,6 @@ import User from "../models/user.model.js"
 const authoriseUser = async(req,res,next) => {
     try{
         const token = req.cookies.jwt;
-        console.log("token",token)
 
         if(!token){
            return res.status(401).json({error : "Unauthorized - No token provided"})

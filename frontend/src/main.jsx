@@ -10,6 +10,7 @@ import { BrowserRouter } from "react-router-dom";
 import { HashRouter } from 'react-router-dom'
 
 import { UserContextProvider } from "./UserContexts.jsx"
+import SocketContextProvider from './SocketContexts.jsx';
 
 
 
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HashRouter>
       <UserContextProvider>
-        <App />
+        <SocketContextProvider>
+          <App />
+        </SocketContextProvider>
       </UserContextProvider>
     </HashRouter>
   </StrictMode>,

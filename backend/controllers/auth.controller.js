@@ -60,7 +60,6 @@ export const signUp = async (req, res) => {
 
 export const logIn = async (req, res) => {
 	try {
-		console.log("req body", req.body)
 		const { username, password } = req.body;
 		const user = await User.findOne({ username });
 		const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");

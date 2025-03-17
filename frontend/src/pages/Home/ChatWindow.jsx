@@ -4,19 +4,26 @@ import { useUserContext } from "../../UserContexts";
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
 import {produce} from "immer"
+import { useSocketContext } from '../../SocketContexts';
+import { formatTime } from '../../utils';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 
 const ChatWindow = ({selectedUser}) => {
   const [messages,setMessages] = useState([])
   const [currentInputMessage,setCurrentInputMessage] = useState("")
-  console.log("selectedUser",selectedUser)
+
+  const [loadingMessages,setLoadingMessages] = useState(false)
+
+  const {socket} = useSocketContext();
 
   const {currentUser} = useUserContext();
 
-  console.log("currentUser chatwindow",currentUser)
 
   useEffect(()=>{
     if(selectedUser){
+      setLoadingMessages(true)
       fetch(`/getmessage/${selectedUser?._id}`, {
         method: 'GET',
         headers: {
@@ -25,8 +32,8 @@ const ChatWindow = ({selectedUser}) => {
         },
       }).then((res)=>{
             res.json().then((res)=>{
-              console.log("messages",res)
               setMessages(res)
+              setLoadingMessages(false)
             })
       })
       .catch(e=>{
@@ -47,7 +54,7 @@ const ChatWindow = ({selectedUser}) => {
   border-radius: 40px;
   padding: 5px;
   color: #000;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   `
   
   const bubbleLeft = css`
@@ -74,12 +81,11 @@ const ChatWindow = ({selectedUser}) => {
     bottom: -18px;
     right: 12px;
   `
-
   const inputBox = css`
      height: 100%;
      width: 100%;
      box-sizing : border-box; 
-     background : #1976d2;
+     background : #84b6e7;
      border: none;
      border-radius: 10px;
 
@@ -89,6 +95,19 @@ const ChatWindow = ({selectedUser}) => {
      ::-webkit-input-placeholder {
         color: white;
     } 
+  `
+
+  const timeLeft = css `
+     position: absolute;
+     left : 25px;
+     color: #84b6e7 !important;
+  `
+
+
+  const timeRight = css `
+     position: absolute;
+     right : 25px;
+     color: #84b6e7 !important;
   `
 
   const sendMessage = async () => {
@@ -101,13 +120,10 @@ const ChatWindow = ({selectedUser}) => {
         }),
 			});
 			const data = await res.json();
+      setMessages([...messages, data]);
 			if (data.error) {
 				throw new Error(data.error);
 			}
-      const allMessages = produce(messages, draftState => {
-        draftState.push(data)
-      })
-      setMessages(allMessages)
       setCurrentInputMessage("")
 		}
     catch(e){
@@ -115,11 +131,26 @@ const ChatWindow = ({selectedUser}) => {
     }
 	};
 
+  const onEnter = (e)=>{
+    if(e.keyCode === 13){
+      sendMessage()
+    }
+  }
+
+
+  socket?.on("newMessage", (newMessage) => {
+    console.log("socket on newmessage",newMessage)
+    // newMessage.shouldShake = true;
+    // const sound = new Audio(notificationSound);
+    // sound.play();
+    setMessages([...messages, newMessage]);
+  });
+
   return (
     <>
     {selectedUser === undefined ? (
              <div  css={css({
-              minWidth: 500,
+              minWidth: 530,
               display: 'flex',
               justifyContent: "center",
               alignItems: "center",
@@ -144,51 +175,56 @@ const ChatWindow = ({selectedUser}) => {
     ) :
       (
         <div css={css({
-          minWidth: 500,
+          minWidth: 530,
           display:"flex",
           flexDirection : "column",
-          margin: 10,
           color: "#1976d2 !important"
       })}>
         <h3 css={css({
           display: "flex",
           flex : 1,
-          borderBottom: "1px solid black",
+          borderBottom: "1px solid #1976d2  ",
           padding: "0px 10px"
         })}>{`To ${selectedUser?.fullName}`}</h3>
         <div css={css({
           flex : 10,
           overflowY: "scroll",
           color : "green",
-          margin: "0px 10px"
+          margin: "0px 10px",
+          maxHeight: 500
         })}>
+          {loadingMessages && <CircularProgress/>}
           {messages.map((msg)=>{
             return <div css={css({
               display : "flex",
-              justifyContent : msg.senderId === currentUser._id ? "flex-end" : "flex-start"
-            })}>
+              justifyContent : msg.senderId === currentUser?._id ? "flex-end" : "flex-start"
+            })}
+            key={msg._id}
+            >
             <div css={chatBubble}>
                 {msg.message}
                 <div css={msg?.senderId === currentUser?._id ? bubbleRight : bubbleLeft}></div>
-              </div>  
-              </div>          
+                <div css={msg?.senderId === currentUser?._id ? timeRight : timeLeft}>{formatTime(msg.createdAt)}</div> 
+              </div> 
+            </div>          
           })}
         </div>
         <div css={css({
           flex : 1,
-          position : "relative"
+          position : "relative",
+          margin: 5
         })}>
           <input type='text-box' css={inputBox}
           placeholder='Send Message'
           value={currentInputMessage}
           onChange={(e)=>setCurrentInputMessage(e.target.value)}
-          onkeydown={()=>sendMessage()}
+          onKeyDown={(e)=>onEnter(e)}
           >
           </input>
           <SendRoundedIcon css={css({
             position : "absolute",
             right: 5,
-            top: 5,
+            top: 10,
             color : "white !important"
           })} onClick={()=>sendMessage()}/>
         </div>
