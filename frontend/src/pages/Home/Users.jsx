@@ -10,8 +10,6 @@ const Users = ({ selectedUser, setSelectedUser }) => {
 
   const { onlineUsers } = useSocketContext();
 
-  //const isOnline = onlineUsers?.includes(conversation._id);
-
   const isUserOnline = useCallback(
     (userId) => {
       return onlineUsers?.includes(userId);
@@ -63,7 +61,7 @@ const Users = ({ selectedUser, setSelectedUser }) => {
       <SearchBar setSearchUser={setSearchUser} />
       <div>
         {filteredUsers?.map((user,index) => {
-          return (
+          return ( 
             <div
               css={css({
                 display: "flex",

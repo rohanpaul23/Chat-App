@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form } from "formik";
 import * as yup from "yup";
-import { Button, TextField } from "@mui/material";
+import { Button, TextField, Alert} from "@mui/material";
 import { css } from '@emotion/react'
 import { shouldDisableSubmit } from "../utils";
 import { Link } from "react-router-dom";
@@ -12,6 +12,7 @@ import { useUserContext } from "../UserContexts";
 const Login = () => {
   let navigate = useNavigate();
   const {setCurrentUser} = useUserContext();
+  const [apiError,setApiError] = useState("")
 
   const validationSchema = yup.object({
     username: yup
@@ -37,11 +38,16 @@ const Login = () => {
           password: values.password,
         }),
       });
-      const user = await result.json()
-      localStorage.setItem("current-user", JSON.stringify(user));
-      setCurrentUser(user)
-      navigate("/home");
 
+      const user = await result.json()
+      if(user.error){
+        setApiError(user.error)
+      }
+      else {
+        localStorage.setItem("current-user", JSON.stringify(user));
+        setCurrentUser(user)
+        navigate("/home");  
+      }
     }
     catch(e){
       console.log(e)
@@ -84,6 +90,21 @@ const Login = () => {
           gap:30,
           height: "100%",
          })}>
+           {apiError ? <Alert
+                        css={css({
+                          margin: "0px 10px",
+                        })}
+                        severity="error"
+                      >
+                        {"Invalid username or password"}
+                      </Alert>  :  <Alert
+                        css={css({
+                          margin: "0px 10px",
+                        })}
+                        severity="info"
+                      >
+                        {"Enter username and password"}
+                      </Alert> }
          <TextField
            css={css({
             margin: "0px 10px",

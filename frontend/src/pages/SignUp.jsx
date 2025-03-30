@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Form } from "formik";
 import * as yup from "yup";
 import { css } from "@emotion/react";
@@ -16,6 +16,7 @@ import { useUserContext } from "../UserContexts";
 const SignUp = () => {
   let navigate = useNavigate();
   const {setCurrentUser} = useUserContext();
+  const [apiError,setApiError] = useState("")
 
   const validationSchema = yup.object({
     fullName: yup
@@ -54,16 +55,24 @@ const SignUp = () => {
         }),
       });
       const user = await result.json();
-      localStorage.setItem("current-user", JSON.stringify(user));
-      setCurrentUser(user)
-      navigate("/home");
+      if(user.error){
+        setApiError(user.error)
+        setOpen(true)
+      }
+      else {
+        localStorage.setItem("current-user", JSON.stringify(user));
+        setCurrentUser(user)
+        navigate("/home"); 
+      }
     }
-    catch(e){
-      console.log("e",e)
+    catch(e){ 
+      console.log("sssssse",e)
     }  
    };
  
-
+   const handleClose = ()=>{
+    setOpen(false)
+   }
   return (
     <div
       css={css({
@@ -108,14 +117,22 @@ const SignUp = () => {
               height: "100%",
             })}
           >
-            <Alert
+            {apiError ? <Alert
+              css={css({
+                margin: "0px 10px",
+              })}
+              severity="error"
+            >
+              {apiError}
+            </Alert>  :  <Alert
               css={css({
                 margin: "0px 10px",
               })}
               severity="info"
             >
               Please enter all the fields to sign up
-            </Alert>
+            </Alert> }
+           
             <TextField
               css={css({
                 margin: "0px 10px",

@@ -7,6 +7,7 @@ import {produce} from "immer"
 import { useSocketContext } from '../../SocketContexts';
 import { formatTime } from '../../utils';
 import CircularProgress from '@mui/material/CircularProgress';
+import notificationSound from "../../assets/notification.mp3"
 
 
 
@@ -139,10 +140,8 @@ const ChatWindow = ({selectedUser}) => {
 
 
   socket?.on("newMessage", (newMessage) => {
-    console.log("socket on newmessage",newMessage)
-    // newMessage.shouldShake = true;
-    // const sound = new Audio(notificationSound);
-    // sound.play();
+    const sound = new Audio(notificationSound);
+    sound.play();
     setMessages([...messages, newMessage]);
   });
 
